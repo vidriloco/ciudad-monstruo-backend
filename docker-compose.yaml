@@ -18,7 +18,7 @@ services:
       - .:/usr/src/app
     depends_on:
       - db
-    command: tail -F /dev/null
+    command: python geodjango/manage.py runserver 0.0.0.0:8000
     restart: on-failure
 
   db:
