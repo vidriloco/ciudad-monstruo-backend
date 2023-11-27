@@ -43,5 +43,5 @@ class Command(BaseCommand):
                 reporter_type=row['tipo_persona'],
                 reporter_status=row['calidad_juridica'],
                 competence=row['competencia'],
-                coordinates=Point(float(latitude), float(longitude)))
+                coordinates=Point(float(longitude), float(latitude)))
             report.save()
