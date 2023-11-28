@@ -1,10 +1,19 @@
-from django.http import JsonResponse
-from django.template import loader
+from django.http import HttpResponse
+import csv
+from world.models import VictimReport
 
-def index(request):
-    data = {
-        'name': 'John Doe',
-        'age': 30,
-        'email': 'john.doe@.com'
-    }
-    return JsonResponse(data, status=200)
+def categories(request):
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'}
+    )
+    
+    writer = csv.writer(response)
+    writer.writerow(["Felony types", "Total"])
+    categories = VictimReport.allCategories()
+    
+    for c in categories:
+        writer.writerow([c["felony"], c["count"]])
+        
+    
+    return response

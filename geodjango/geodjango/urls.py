@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from world import views
+from world import api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('victimas/', views.index),
+    path('stolen-bikes/', api.stolen_bikes),
+    path('categories/', views.categories)
 ]
