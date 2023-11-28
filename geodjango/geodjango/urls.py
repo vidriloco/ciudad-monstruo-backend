@@ -21,5 +21,6 @@ from world import api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('stolen-bikes/', api.stolen_bikes),
+    path('transit-incidents/', api.transit_incidents),
     path('categories/', views.categories)
 ]
