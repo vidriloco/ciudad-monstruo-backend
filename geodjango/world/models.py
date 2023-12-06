@@ -33,7 +33,11 @@ class VictimReport(models.Model):
     
     @staticmethod
     def findAllTransitIncidentsWithinViewport(min_longitude, min_latitude, max_longitude, max_latitude):
-        victims = VictimReport.objects.filter(felony__startswith='HOMICIDIO CULPOSO POR TRÁNSITO VEHICULAR').annotate(record_count=Count('id'))
+        bbox_coords = (min_longitude, min_latitude, max_longitude, max_latitude)
+        
+        bbox = Polygon.from_bbox(bbox_coords)
+        
+        victims = VictimReport.objects.filter(coordinates__within=bbox, felony__startswith='HOMICIDIO CULPOSO POR TRÁNSITO VEHICULAR').annotate(record_count=Count('id'))
         
         results = {
             'HOMICIDIO CULPOSO POR TRÁNSITO VEHICULAR': [],
