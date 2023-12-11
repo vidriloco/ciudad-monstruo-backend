@@ -3,7 +3,8 @@ version: "3.4"
 services:
   app:
     build:
-      context: ./
+      context: .
+      dockerfile: Dockerfile
     image: geodjango
     environment:
       PYTHONDONTWRITEBYTECODE: "no-write"
