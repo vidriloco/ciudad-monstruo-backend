@@ -1,31 +1,21 @@
-# GeoDjango Tutorial kick-off
+# Ciudad Monstruo
 
-Helper repo for trying out [GeoDjango Tutorial](https://docs.djangoproject.com/en/dev/ref/contrib/gis/tutorial/).
+### How to deploy
 
-Works with
-- Python 3.9.7
-- PostGIS 3.1.4 on top of PostgreSQL 14
-- gdal
+1. Clone this github repo
+2. Install Docker
+3. Prepare the docker image doing `docker compose build` or `docker-compose build`
+4. Make sure the mapping of ports is correct in the `docker-compose.yaml` file
+5. Run the docker image by doing: `docker compose up` or `docker-compose up`
 
+If all goes alright, the docker instance should be running. Now, connect to the app server and prepare the database and seed data:
 
-## How to run the Django server
+1. By doing `docker ps` you can find the running docker instances
+2. Connect to the instance by doing: `docker exec -it <container name> /bin/bash`
+3. Run the migrations: `python3 manage.py migrate` from the geodjango directory
+4. Import the data from the CSV file: `python3 manage.py loadvictims`
+5. Create superuser by doing `python manage.py createsuperuser`
 
-Tested with
+### How to connect with DB
 
-- Docker 24.0.1
-- Docker Compose version v2.11.0
-
-The included [docker-compose.yaml](docker-compose.yaml) file just starts a
-container, but does not run the Django server by default.
-
-Run `docker compose exec app bash` to exec into the app container.
-`WorldBorder` model is ready, but you need to run
-`python3 geodjango/manage.py migrate` to apply migrations.
-
-Then run `python geodjango/manage.py runserver 0.0.0.0:8000` to start
-the Django app on the exposed port `8000`.
-
-Alternatively, replace `command: tail -F /dev/null` with
-`command: python geodjango/manage.py runserver 0.0.0.0:8000` in
-[docker-compose.yaml](docker-compose.yaml#L21) so that the app starts along
-with the `db` service.
+Use this: `psql -U geodjango -d gis`
