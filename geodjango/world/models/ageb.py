@@ -12,6 +12,8 @@ class Ageb(models.Model):
     public_transport_assault_events_count = models.IntegerField(default=0)
     bike_theft_events_count = models.IntegerField(default=0)
     car_theft_events_count = models.IntegerField(default=0)
+    car_accessories_theft_events_count = models.IntegerField(default=0)
+    car_internal_belongings_theft_events_count = models.IntegerField(default=0)
     motorcicle_theft_events_count = models.IntegerField(default=0)
     pedestrian_theft_events_count = models.IntegerField(default=0)
     pedestrian_accidents_events_count = models.IntegerField(default=0)

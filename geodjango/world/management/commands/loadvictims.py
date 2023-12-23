@@ -27,7 +27,6 @@ class Command(BaseCommand):
         # Show this before loading the data into the database
         print("Loading victims data")
 
-
         #Code to load the data into database
         for row in DictReader(open('./victims-2023.csv')):
             latitude = 0 if row['latitud'] == "NA" else row['latitud']

@@ -10,11 +10,8 @@ class Command(BaseCommand):
     help = "Loads data from agebs.json"
 
     def handle(self, *args, **options):
-    
-        # Show this if the data already exist in the database
-        if Ageb.objects.exists():
-            print('Ageb data already loaded...exiting.')
-            return
+        print("Remove existing ageb data")
+        Ageb.objects.all().delete()
             
         # Show this before loading the data into the database
         print("Ingesting AGEB data")
