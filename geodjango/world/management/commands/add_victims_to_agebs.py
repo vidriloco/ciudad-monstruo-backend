@@ -39,8 +39,20 @@ class Command(BaseCommand):
             motorcicle_theft_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony__startswith="ROBO DE MOTOCICLETA")
             ageb.motorcicle_theft_events_count = len(motorcicle_theft_reports)
 
+            motorcicle_accident_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony="Motociclista")
+            ageb.motorcicle_accidents_events_count = len(motorcicle_accident_reports)
+
+            crash_accidents_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony__startswith="Choque ")
+            ageb.crash_accidents_events_count = len(crash_accidents_reports)
+
+            bike_accidents_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony="Ciclista")
+            ageb.bike_accidents_events_count = len(bike_accidents_reports)
+
             pedestrian_theft_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony__startswith="ROBO A TRANSEUNTE EN VIA PUBLICA")
             ageb.pedestrian_theft_events_count = len(pedestrian_theft_reports)
+
+            pedestrian_accidents_reports = VictimReport.objects.filter(coordinates__within=ageb.geometry, felony="Atropellado")
+            ageb.pedestrian_accidents_events_count = len(pedestrian_accidents_reports)
             
             ageb.save()
 

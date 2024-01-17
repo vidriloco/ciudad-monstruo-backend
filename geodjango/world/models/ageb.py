@@ -11,19 +11,28 @@ class Ageb(models.Model):
     geometry = models.PolygonField(srid=4326)
     public_transport_assault_events_count = models.IntegerField(default=0)
     bike_theft_events_count = models.IntegerField(default=0)
+    bike_accidents_events_count = models.IntegerField(default=0)
     car_theft_events_count = models.IntegerField(default=0)
     car_accessories_theft_events_count = models.IntegerField(default=0)
     car_internal_belongings_theft_events_count = models.IntegerField(default=0)
-    motorcicle_theft_events_count = models.IntegerField(default=0)
     pedestrian_theft_events_count = models.IntegerField(default=0)
     pedestrian_accidents_events_count = models.IntegerField(default=0)
     crash_accidents_events_count = models.IntegerField(default=0)
     motorcicle_accidents_events_count = models.IntegerField(default=0)
+    motorcicle_theft_events_count = models.IntegerField(default=0)
     bicicle_accidents_events_count = models.IntegerField(default=0)
 
+    @staticmethod
+    def findAllAgebsWithinViewport(min_longitude, min_latitude, max_longitude, max_latitude):
+        bbox_coords = (min_longitude, min_latitude, max_longitude, max_latitude)
+        
+        bbox = Polygon.from_bbox(bbox_coords)
+        
+        return Ageb.objects.filter(geometry__intersects=bbox)
+    
 
 class AgebVictimReport(models.Model):
-    ageb = models.ForeignKey(Ageb, on_delete=models.CASCADE)
+    ageb = models.ForeignKey(Ageb, on_delete=models.CASCADE, related_name='victim_reports')
     victim_report = models.ForeignKey('VictimReport', on_delete=models.CASCADE)
     first_category = models.CharField()
     second_category = models.CharField()

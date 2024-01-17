@@ -23,7 +23,7 @@ urlpatterns = [
     path('stolen-bikes', api.stolen_bikes),
     path('transit-incidents', api.transit_incidents),
     path('public-transport-incidents', api.public_transport_incidents),
-    path('categories/', views.categories)
+    path('categories/', views.categories),
+    path('agebs/', api.agebs),
+    path('agebs/<int:ageb_id>', api.ageb_details)
 ]
-
-#AME231206055280 11AM -3PM
