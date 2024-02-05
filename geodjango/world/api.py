@@ -9,9 +9,10 @@ def agebs(request):
     max_lon = request.GET.get('max_lon')
     max_lat = request.GET.get('max_lat')
     max_results = request.GET.get('max_results')
+    optimized = request.GET.get('optimized')
     
     agebs = Ageb.findAllAgebsWithinViewport(min_lon, min_lat, max_lon, max_lat)
-    return JsonResponse({ 'agebs': serialize_ageb_records(agebs) }, status=200)
+    return JsonResponse({ 'agebs': serialize_ageb_records(agebs, optimized) }, status=200)
 
 def ageb_details(request, ageb_id):
     category_type = request.GET.get('category_type')
@@ -84,7 +85,7 @@ def serialize_records(records):
         'time': record.time,
         'incident-type': record.incident_type() } for record in records]
 
-def serialize_ageb_records(records):
+def serialize_ageb_records(records, optimized):
     return [{
         'id': record.id, 
         'public_transport_assault_events_count': record.public_transport_assault_events_count, 
@@ -98,7 +99,7 @@ def serialize_ageb_records(records):
         'crash_accidents_events_count': record.crash_accidents_events_count, 
         'motorcycle_accidents_events_count': record.motorcicle_accidents_events_count, 
         'bicycle_accidents_events_count': record.bike_accidents_events_count, 
-        'geometry': record.geometry.coords,
+        'geometry': record.geometry.simplify(0.0001).coords if optimized == "true" else record.geometry.coords,
         'centroid': [record.geometry.centroid.x, record.geometry.centroid.y] } for record in records]
 
 def serialize_ageb_detail_records(ageb_record, reports):
