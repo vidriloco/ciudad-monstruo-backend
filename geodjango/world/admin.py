@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import VictimReport
 from .models import Ageb
 from .models import AgebVictimReport
+from .models import Conversation
 
 @admin.register(VictimReport)
 
@@ -17,3 +18,10 @@ class AgebAdmin(admin.ModelAdmin):
 
 class AgebVictimReportAdmin(admin.ModelAdmin):
    list_display=['ageb', 'victim_report', 'first_category', 'second_category']
+   
+   
+@admin.register(Conversation)
+
+class ConversationAdmin(admin.ModelAdmin):
+   list_display=['date', 'message', 'source', 'deviceID', 'useCase']
+   

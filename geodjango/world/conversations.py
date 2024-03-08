@@ -3,12 +3,18 @@ from django.http import JsonResponse
 import os
 import time
 import re
+from .models import Conversation
+from django.utils import timezone
+from django.core.serializers import serialize
+import re
 
 API_KEY="sec_a42axrOb43kzQDonkpxySMtNOYhRc2eO"
 
 def ask_to_pdf(request):
     query = request.GET.get('query')
     case = request.GET.get('case')
+    device_id = request.GET.get('device_id')
+    use_history = request.GET.get('use_history')
     
     if query is None:
         return JsonResponse({}, status=400)
@@ -18,17 +24,41 @@ def ask_to_pdf(request):
     if pdf_id is None:
         pdf_id = get_pdf_id_for(pdf_url_for_use_case(case))
     
-    response = ask_question(pdf_id, query)
-    
-    time.sleep(5)
-    #item = "es una indagación [P12] en la profunda conexión humana con el acto de [P13] correr. Hemos viajado a todos los [P14] continentes, donde nuestras protagonistas, [P15] corredoras de diferentes culturas y estratos sociales nos guiarán para descubrir el verdadero significado del deporte, uno que toca las fibras mismas de lo que nos hace humanos. Filmada en México, España, Grecia, Japón y Kenia."
-    if response.status_code == 200:
-        json = response.json()
-        return JsonResponse({'answer': parse_string(json['content']), 'references': json['references'] }, status=200)
-        #return JsonResponse({'answer': parse_string(item), 'references': {} }, status=200)
+    userMessage = Conversation(date=timezone.now(), message=query, source="U", deviceID=device_id, useCase=case)
+    if userMessage.save() == None:
+        history = Conversation.objects.filter(deviceID=device_id, useCase=case).order_by('date')[:3] if use_history else []
+        response = ask_question(pdf_id, query, history)
+        
+        if response.status_code == 200:
+            content = response.json()['content']
+            
+            assistantMessage = Conversation(date=timezone.now(), message=content, source="A", deviceID=device_id, useCase=case)
+            assistantMessage.save()
+            
+            return JsonResponse({'answer': parse_string(content)}, status=200)
+        else:
+            return None
     else:
-        return None
+        return JsonResponse({'error': "No recibimos tu mensaje, intenta de nuevo"}, status=404)
 
+def details(request, device_id, use_case):    
+    conversations = Conversation.objects.filter(deviceID=device_id, useCase=use_case).order_by('date')
+    values = conversations.values(*['date', 'message', 'source'])
+    
+    pattern = r'\[Página (\d+)\]'
+    
+    parsed_values = []
+    for entry in values:
+        entry['message'] = parse_string(re.sub(pattern, replace_page_number, entry['message']))
+        parsed_values.append(entry)
+            
+    return JsonResponse({ 'collection': parsed_values }, status=200)
+    
+
+def replace_page_number(match):
+    page_number = match.group(1)
+    return f"[P{page_number}]"
+    
 def parse_string(input_string):
     pattern = r'([^[]+)(?:\s*\[P(\d+)\]\s*|$)'
     matches = re.finditer(pattern, input_string)
@@ -41,23 +71,31 @@ def parse_string(input_string):
 
     return result
 
-def ask_question(pdf_id, question):
+def ask_question(pdf_id, question, history):
     headers = {
         'x-api-key': API_KEY,
         "Content-Type": "application/json",
     }
-
+    
+    historic_messages = []
+    
+    for item in history:
+        historic_messages.append({
+            'role': 'user' if item.source == "U" else "assistant",
+            'content': item.message
+        })
+    
     data = {
         'referenceSources': True,
         'sourceId': pdf_id,
-        'messages': [
-            {
-                'role': "user",
-                'content': question,
-            }
-        ]
+        'messages': historic_messages if historic_messages else {
+            'role': "user",
+            'content': question,
+        }
     }
-
+    
+    print(data)
+    
     return requests.post('https://api.chatpdf.com/v1/chats/message', headers=headers, json=data)
 
 def get_pdf_id_for(url):

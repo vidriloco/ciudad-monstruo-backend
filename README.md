@@ -19,3 +19,11 @@ If all goes alright, the docker instance should be running. Now, connect to the 
 ### How to connect with DB
 
 Use this: `psql -U geodjango -d gis`
+
+### How to migrate down
+
+python3 manage.py migrate world 0010 will undo the migration starting with 0010
+
+### Show the available migrations
+
+python3 manage.py showmigrations world

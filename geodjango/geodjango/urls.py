@@ -12,5 +12,6 @@ urlpatterns = [
     path('categories/', views.categories),
     path('agebs/', api.agebs),
     path('agebs/<int:ageb_id>', api.ageb_details),
-    path('conversations', conversations.ask_to_pdf)
+    path('conversations', conversations.ask_to_pdf),
+    path('conversations/<uuid:device_id>/details/<str:use_case>', conversations.details)
 ]
